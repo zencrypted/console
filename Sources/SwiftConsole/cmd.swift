@@ -117,6 +117,9 @@ public class Cmd {
      print(": bye — Quit Application")
      print(": kw — AES Key Wrap")
      print(": kdf — Key Derive Function ")
+     print(": login <NICK> — Connect to Relay")
+     print(": send <TO> <TEXT> — Send Message")
+     print(": logout — Disconnect")
   }
 
   public static func execute(_ data: Array<String>) throws -> Bool {
@@ -129,6 +132,17 @@ public class Cmd {
          case "form": try Form.show(data: data) ; return false
          case "show": try Cmd.showDER(data: data) ; return false
 //         case "kdf": try Cmd.showKDF(data: data) ; return false
+         case "login":
+             if data.count > 1 { try RelayClient.shared.login(nickname: data[1]) }
+             else { print(": usage: login <nickname>") }
+             return false
+         case "logout": RelayClient.shared.logout(); return false
+         case "send":
+             if data.count > 2 {
+                 let text = data.dropFirst(2).joined(separator: " ")
+                 try RelayClient.shared.send(to: data[1], text: text)
+             } else { print(": usage: send <to> <text>") }
+             return false
          default: return false
      }
   }
